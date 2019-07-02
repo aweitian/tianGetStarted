@@ -1,0 +1,1 @@
+ALTER TABLE `task` ADD COLUMN `rank_id` INT NULL COMMENT '排名ID' AFTER `err_msg`;

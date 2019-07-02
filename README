@@ -1,0 +1,22 @@
+总账号 是我登录的
+操作员 是组长登录
+普通账号是员工登录
+
+组长有的管理几个员工，这样管理方便
+
+只要登录自己账号就可以随时查看所有人的
+
+03iOBWTcTDATT4YC
+
+origin  ssh://git@211.149.221.76:22000/webroot/git/sc.hxjdq.com.git (fetch)
+ssh -p 22000 git@211.149.221.76
+scp -r -P 22000 git@211.149.221.76:/webroot/www/default/app ~/Desktop/
+
+validator 在验证ARRAY类型时，错误提示少了FIELD。
+
+
+
+YBY那边查排名API数据PUSH到总rank_history
+计费系统和刷词系统同步这个总数据
+
+排名查询提交是分别提交，重复了没有问题
