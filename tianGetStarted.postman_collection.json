@@ -1,0 +1,353 @@
+{
+	"info": {
+		"_postman_id": "fa314b2b-2f78-475c-bf24-fd8abea66e27",
+		"name": "tianGetStarted",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "test-user-index",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/debug/login",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-allRoles",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{url}}/debug/user/allRoles",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"user",
+						"allRoles"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-loginAsAdmin",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "aaa",
+							"type": "text"
+						},
+						{
+							"key": "pwd",
+							"value": "lv@git",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/login/loginAs",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"login",
+						"loginAs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-loginAsRoot",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "root",
+							"type": "text"
+						},
+						{
+							"key": "pwd",
+							"value": "lv@git",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/login/loginAs",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"login",
+						"loginAs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-add",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "aaa",
+							"type": "text"
+						},
+						{
+							"key": "pwd",
+							"value": "lv@git",
+							"type": "text"
+						},
+						{
+							"key": "role[]",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "role[]",
+							"value": "debug",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/user/add",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"user",
+						"add"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-updateRole",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "aaa",
+							"type": "text"
+						},
+						{
+							"key": "role[]",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "role[]",
+							"value": "test",
+							"type": "text"
+						},
+						{
+							"key": "role[]",
+							"value": "user",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/user/updateRole",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"user",
+						"updateRole"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-updatePwd",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "aaa",
+							"type": "text"
+						},
+						{
+							"key": "old",
+							"value": "lv@git",
+							"type": "text"
+						},
+						{
+							"key": "new",
+							"value": "qq123",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/user/updatePwd",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"user",
+						"updatePwd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-resetPwd",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "aaa",
+							"type": "text"
+						},
+						{
+							"key": "pwd",
+							"value": "lv@git",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/user/resetPwd",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"user",
+						"resetPwd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "test-user-remove",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/x-www-form-urlencoded"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "login",
+							"value": "aaa",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{url}}/debug/user/remove",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"debug",
+						"user",
+						"remove"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

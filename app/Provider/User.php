@@ -56,6 +56,7 @@ class User extends ServiceProvider
             throw new Exception("required config key app.session_key.privilege");
         }
         $this->session_key = $this->config->get("app.session_key.privilege");
+        $this->role = $this->app->make("role");
     }
 
     public function calcPwd($pwd)
@@ -98,6 +99,17 @@ class User extends ServiceProvider
         return null;
     }
 
+    public function allRoles()
+    {
+        return $this->role->getAllRoles();
+    }
+
+    /**
+     * @param $login
+     * @param $password
+     * @param array $roles
+     * @return Cmd
+     */
     public function add($login, $password, array $roles)
     {
         $cmd = new Cmd();
@@ -121,7 +133,7 @@ class User extends ServiceProvider
         if ($uid > 0) {
             $allRoles = $this->role->getAllRoles();
             $roles = Arr::g($allRoles, $roles);
-            foreach ($roles as $role) {
+            foreach ($roles as $role => $role_txt) {
                 $sql = "INSERT INTO `user_role` (`uid`, `role`) VALUES (:uid, :role);";
                 $bind = compact('uid', 'role');
                 $this->connection->insert($sql, $bind);
@@ -129,6 +141,117 @@ class User extends ServiceProvider
             return $cmd->setData($uid);
         }
         return $cmd->markAsError()->setMessage("insert failed");
+    }
+
+    public function rm($login)
+    {
+        $cmd = new Cmd();
+        if (empty($login)) {
+            $cmd->markAsError()->setMessage("login is required.");
+            return $cmd;
+        }
+        if ($login == $this->env['root']) {
+            $cmd->markAsError()->setMessage("$login is reserved.");
+            return $cmd;
+        }
+        $bind = compact('login');
+        $this->connection = $this->app->make("connection");
+        $sql = "DELETE FROM `user_role` WHERE `uid` = (SELECT `uid` FROM `user` WHERE `login` = :login)";
+        $this->connection->exec($sql, $bind);
+        $sql = "DELETE FROM `user` WHERE `login` = :login";
+        $uid = $this->connection->exec($sql, $bind);
+        if ($uid > 0) {
+            return $cmd->setData($uid);
+        }
+        return $cmd->markAsError()->setMessage("$login not found");
+    }
+
+    public function resetPwd($login, $new_pwd)
+    {
+        $cmd = new Cmd();
+        if (empty($login) || empty($new_pwd)) {
+            $cmd->markAsError()->setMessage("login and new pwd is required.");
+            return $cmd;
+        }
+        if ($login == $this->env['root']) {
+            $cmd->markAsError()->setMessage("$login is reserved.");
+            return $cmd;
+        }
+        $this->connection = $this->app->make("connection");
+
+        $bind = compact('login');
+        $bind['new_pwd'] = $this->calcPwd($new_pwd);
+        $sql = "UPDATE `user` SET `password` = :new_pwd WHERE `login` = :login";
+        $uid = $this->connection->exec($sql, $bind);
+        if ($uid > 0) {
+            return $cmd->setData($uid);
+        }
+        return $cmd->markAsError()->setMessage("reset password failed");
+    }
+
+    public function updatePwd($login, $old_pwd, $new_pwd)
+    {
+        $cmd = new Cmd();
+        if (empty($login) || empty($old_pwd) || empty($new_pwd)) {
+            $cmd->markAsError()->setMessage("login,old and new pwd is required.");
+            return $cmd;
+        }
+        if ($login == $this->env['root']) {
+            $cmd->markAsError()->setMessage("$login is reserved.");
+            return $cmd;
+        }
+        $this->connection = $this->app->make("connection");
+
+        $bind = compact('login');
+        $bind['old_pwd'] = $this->calcPwd($old_pwd);
+        $bind['new_pwd'] = $this->calcPwd($new_pwd);
+        $sql = "UPDATE `user` SET `password` = :new_pwd WHERE `login` = :login and `password` = :old_pwd";
+        $uid = $this->connection->exec($sql, $bind);
+        if ($uid > 0) {
+            return $cmd->setData($uid);
+        }
+        return $cmd->markAsError()->setMessage("update password failed");
+    }
+
+    public function updateRole($login, array $new_roles)
+    {
+        $cmd = new Cmd();
+        if (empty($login)) {
+            $cmd->markAsError()->setMessage("login is required.");
+            return $cmd;
+        }
+        if ($login == $this->env['root']) {
+            $cmd->markAsError()->setMessage("$login is reserved.");
+            return $cmd;
+        }
+        $this->connection = $this->app->make("connection");
+
+        $bind = compact('login');
+        $uid = $this->connection->scalar("SELECT `uid` FROM `user` WHERE `login` = :login", $bind);
+        if (!$uid) {
+            return $cmd->markAsError()->setMessage("$login is not exists");
+        }
+        $sql = "SELECT `uid`, `role` FROM `user_role` WHERE `uid` = $uid";
+
+        $exists_roles = $this->connection->fetchAll($sql);
+        $exists_roles = array_column($exists_roles, "role");
+
+        $delete_array = array_diff($exists_roles, $new_roles);
+        $add_array = array_diff($new_roles, $exists_roles);
+
+        foreach ($delete_array as $role) {
+            $bind = compact("role", "uid");
+            $sql = "DELETE FROM `user_role` WHERE `uid` = :uid AND `role` = :role";
+            $this->connection->exec($sql, $bind);
+        }
+
+        foreach ($add_array as $role) {
+            $sql = "INSERT INTO `user_role` (`uid`, `role`) VALUES (:uid, :role);";
+            $bind = compact('uid', 'role');
+            $this->connection->insert($sql, $bind);
+        }
+
+        return $cmd->setMessage("ok");
     }
 
     public function auth($name, $pass)
@@ -140,15 +263,18 @@ class User extends ServiceProvider
         if (!$this->onlyRoot) {
             $this->connection = $this->app->make("connection");
             $row = $this->connection->fetch("SELECT * FROM `user` WHERE `login` = :code", array('code' => $name));
+
             if ($row) {
-                if ($row['pass'] == $this->calcPwd($pass)) {
+                if ($row['password'] == $this->calcPwd($pass)) {
                     $roles = $this->connection->fetchAll("SELECT * FROM user_role WHERE uid = :uid", array(
                         "uid" => $row['uid']
                     ));
 
                     $roles = array_column($roles, "role");
                     $allRoles = $this->role->getAllRoles();
-
+                    $bind = array("uid" => $row['uid'], "last_login" => date("Y-m-d H:i:s"));
+                    $sql = "UPDATE `user` SET `last_login` = :last_login, `login_count` = `login_count` + 1 WHERE `uid` = :uid";
+                    $this->connection->exec($sql, $bind);
                     $this->_auth(Arr::g($allRoles, $roles), $row['uid'], $name);
                     return true;
                 }

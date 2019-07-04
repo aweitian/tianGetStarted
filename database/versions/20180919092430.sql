@@ -1,1 +1,0 @@
-ALTER TABLE `task` ADD COLUMN `rank_update_date` DATE NULL AFTER `rank_change`;

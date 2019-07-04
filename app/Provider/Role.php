@@ -23,6 +23,8 @@ class Role extends ServiceProvider
     public function getAllRoles()
     {
         $roles = require $this->app->configPath("privilege.php");
-        return $roles['role'];
+        $ret =  $roles['role'];
+        $ret[Role::ROLE_ROOT] = Role::ROLE_ROOT_TEXT;
+        return $ret;
     }
 }

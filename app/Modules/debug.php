@@ -10,23 +10,22 @@ namespace App\Modules;
 
 
 use App\Application;
-use Aw\View;
+use Aw\Cmd;
 
 class debug
 {
-    /**
-     * @var View
-     */
-    protected $view;
-
     /**
      * @var Application
      */
     protected $app;
 
+    /**
+     * @var Cmd
+     */
+    protected $cmd;
     public function __construct()
     {
         $this->app = getApp();
-        $this->view = new View($this->app->resourcePath('views') . DIRECTORY_SEPARATOR . 'debug');
+        $this->cmd = new Cmd();
     }
 }

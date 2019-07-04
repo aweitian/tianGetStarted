@@ -38,4 +38,12 @@ $router->pmcai("/api", array('\App\Middleware\ApiLogin', '\App\Middleware\ApiJso
 ))->setName('api');
 
 
-
+$router->pmcai("/debug", array('\App\Middleware\ApiLogin', '\App\Middleware\ApiJsonOutput'), array(
+    "namespace" => "\\App\\Modules\\Debug\\",
+    "ctl_tpl" => "{}",
+    "act_tpl" => "{}"
+), array(
+//    "mask" => "mca",
+    "check_dispatch" => true,
+//    "module" => "api"
+))->setName('debug');
